@@ -1,0 +1,79 @@
+프로젝트 생성이 좀 느린게 싫다면 yarn 1.22버전 설치 후 재부팅 (2.X 버전은 아직 불안정)
+yarn >> npm, npx 대체 라이브러리 관리 (안정성, 속도 높음)
+
+npx create-react-app ~ : yarn으로 자동 구동
+npm install ~ : yarn add ~
+npm run start : yarn start
+
+=====================================================================================
+
+React 부트스트랩 설치
+
+React는 보통 전용 부트스트랩을 설치해 사용한다(React Bootstrap 치면 나옴)
+1. Get Started의 현재 제안하는 버전의 것을 설치하면 됨 (현재 : npm install react-bootstrap bootstrap@4.6.0) (Mac에서 보안 걸리면 언제나 똑같이 앞에 sudo)
+
+2. (모든 기능을 사용하는 경우/ 특정 스타일은 CSS파일을 또 요구하기에)index.html에 css 링크 복붙 (CDN) >> 아님 해당 링크로 들어가 파일로 받은 뒤 저장 후 불러옴
+
+3. import Button from  'react-bootstrap / Button' ; 이런식으로 컴포넌트 요소마다 가져오는 경우 클라이언트로 보내는 데이터 크게 줄이기 가능
+    >> 대문자들이 가져와야할 컴포넌트들
+    >> 리액트는 JSX 때문에 그런지 각 구성요소를 컴포넌트로 새로 만들어 저장되어있음
+
+
+4. 사용은 기존 Bootstrap사이트나(css 사이즈가 더 크긴 함) React-Bootstrap 어느쪽에서건 복붙해서 사용은 가능
+
+
+=====================================================================================
+
+Vue 부트스트랩 설치
+
+1. index.html 링크 지정 경우 : index.html에 기존처럼 css, js을 CDN으로 받아오던 or 파일 저장 후 경로 지정
+
+2. npm의 경우 : 1) bootstrap 5버전 : npm install bootstrap@next @popperjs/core || 4버전 : npm install bootstrap jquery popper.js
+               2) main.js에다가 >> import 'bootstrap'; import 'bootstrap/dist/css/bootstrap.min.css';
+               
+               
+               (참고로 react도 App.js나 index.js에 import  'bootstrap / dist / css / bootstrap.min.css' ;로 css 들이는거 처리해도 됨)
+
+
+=====================================================================================
+
+++ 꾸미기 추가
+첨부파일 저장시 유의점
+
+public이 아닌 src에 넣을 경우 build시 압축+파일명변경 이 이뤄짐 >> static image를 가져올 때 public은 가져오는 방식이 좀 다름(절대경로 필요)
+정확히는 / 루트 경로로 해서 public의 파일 가져올 수 있었으나 react17부터 css파일에서 안됨
+
+오랜만의 보는 부트스트랩 기본 반응형 문법 : container랑 row로 감싸고 col을 총 12가 되게 나눔 (md, lg등은 기준)
+
+img src에 ``하려면 {`https://codingapple1.github.io/shop/shoes${i + 1}.jpg`} 처럼 {}로 한번 바인딩 후 한다
+
+=====================================================================================
+
+export / import 문법 (data.js 참고)
+
+1. export default 방법
+
+변수 = data
+
+export default 변수 한뒤 -> 위치는 보통 가장 마지막 + 지정은 한개만
+
+> 단지 export default의 경우는 export default 하고 변수 없이 바로 data를 붙이기도 함 (= 없음)
+
+=======================
+
+import 변수(마음대로 작명 가능) from 위 export파일 경로
+
+위에서 작명한 변수로 사용
+
+2. export {} /import 방법
+
+let 변수1; let 변수2;
+
+export {변수1, 변수2};
+
+=======================
+
+import {변수1, 변수2} from 경로 >> 이 경우는 가져오는 파일에서 마음대로 작명 불가 (당연하다)
+
+
+3. 이 export / import의 사용법은 Vue도 거의 마찬가지
