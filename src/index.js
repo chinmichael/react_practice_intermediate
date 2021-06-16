@@ -6,11 +6,13 @@ import reportWebVitals from './reportWebVitals';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import { BrowserRouter } from 'react-router-dom';
+
 ReactDOM.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById('root') // html의 id="root" 요소에 위 App을 넣어라
 );
 
 // If you want to start measuring performance in your app, pass a function

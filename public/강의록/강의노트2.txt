@@ -1,0 +1,133 @@
+Router : 페이지 나누기,이동(URL 변경 = GET요청)을 서버를 거치지 않고 하기 위함 (SPA이므로)
+
+React Router 세팅
+
+react-router-dom 라이브러리 활용
+
+npm install react-router-dom 로 설치
+
+index.js에서
+import { BrowserRouter } from 'react-router-dom';
+
+ReactDOM.render(
+  <React.StrictMode>
+    <BrowserRouter> // 랜더링 함수의 루트 컴포넌트를 라우터로 한번 더 감싼다.
+        <App />
+    </BrowserRouter>
+  </React.StrictMode>,
+  document.getElementById('root') // html의 id="root" 요소에 위 App을 넣어라
+);
+
+BrowserRouter가 아니라 HashRouter를 사용할 경우 index.js에서
+import { HahsRouter } from 'react-router-dom';
+
+ReactDOM.render(
+  <React.StrictMode>
+    <HahsRouter> // 랜더링 함수의 루트 컴포넌트를 라우터로 한번 더 감싼다.
+        <App />
+    </HahsRouter>
+  </React.StrictMode>,
+  document.getElementById('root') // html의 id="root" 요소에 위 App을 넣어라
+);
+
+>> HashRouter는 라우팅을 안전하게 해줌 (서버에 GET요청을 하는걸 주소에 #을 넣으므로서 원천적으로 차단시켜버림 (서버는 # 뒤의 것을 서버로 전달하지 않음))
+>> 물론 서버에서 라우팅을 React 등에 일임하게 설정하면 그냥 BrowserRouter해도 됨
+
+
+==============================================================================================
+
+Vue Router 세팅(Vue는 3 / vue-router4버전 기준(main.js creatApp 함수로 지정하는 방식때문))의 경우
+
+1. package.json에서 버전 확인
+
+2. 
+npm install vue-router
+or
+npm install vue-router@4 (vue 3의 경우 위를 입력했을 때는 이 @4를 입력한 커맨드로 업그레이드 가능)
+
+3. router.js 파일(이름은 바꿀 수 있음) 생성 + main.js에서 vue-router 세팅
+
+router.js
+import { createWebHistory, createRouter } from "vue-router";
+
+import 컴포넌트 from 컴포넌트경로;
+import Detail from './components/Detail.vue';
+
+//라우팅 경로 변수는 Array + Object
+const routes = [
+    {
+        path: "router-link에 쓸 경로"
+        component: "위에서 import한 컴포턴트명"
+    },
+    {
+        path: "/detail/:id" // "아래 route.params.식별자"에 식별자는 :~로 씀
+        component: Detail,
+        children: [ // nested라우터 이용을 할 경우
+            {
+                path: "" // 주의할 점은 '/'는 루트를 의미하므로 빼고 상대경로를 쓴다
+                component: 
+            },
+            {
+                path: "comment" // /detail/commnet가 됨
+                component: Comment
+            }
+        ]
+    },
+    {
+        path: '/list'
+        component: {
+            List: List,
+            Comment: Comment,
+        }
+        // +) named view : /list 방문시 <List> <Comment> <Author> 등 여러 컴포넌트를 보여줄 때 >> 컴포넌트를 오브젝트로 해서 사용 (<router-view>가 여러개겠지)
+    },
+    {
+        path: '/home'
+        redirect: '/' // 혹은 redirect: {name:'index'} 등으로 특정 경로 접속시 일정 경로로 이동시키는 redirection도 가능
+    },
+    {
+        path: "/:anythig(.*)", 이런식으로 파라미터 문법 + 정규식을 이용해 에러페이지 적용을 할 수 있다. (특히 에러페이지에 따라 굳이 서버를 거치지 않아도 되는 경우가 있지)
+        component:
+    }
+]
+
+const router = createRouter({ // vue-router4는 이 함수에 라우터 설정을 함
+    history: createWebHistory(),
+    routes,
+});
+export default router;
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+main.js
+import { creatApp } from 'vue' (vue3로 업글시)
+import App from './App.vue' // >> index가 될 파일
+import router from './router.js'
+
+createApp(App).use(router).mount('#app')
+
+==============================================================================================
+==============================================================================================
+
+React router 기본 사용법
+
+
+
+==============================================================================================
+
+Vue router 기본 사용법 
+
+컴포넌트를 이동해 보여줄 장소에 <컴포넌트명> 대신 <router-view>를 사용  (props할 데이터는 마찬가지로 해당 태그에 v-bind함)
+해당 컴포넌트로 이동시킬 anchor 내부에 <a href="#"><router-link class="" to="/">text</router-link></a>로 라우터 이동 태그 삽입 (to는 "/(루트)~")로
+
+물론 <router-link to="/~">에서 to에 v-bind:to (or :to)로 데이터 바인딩을 하여 보낼 수 있음
+이때, :to="'/detail/' + a.number"의 경우 detail이란 이름의 파라미터로 바디에 id를 보낸다고 생각(/자원(파라미터)/식별자(id)) ("{ name: 'detail', params: { id: a.number } }")
+이동한 컴포넌트에서 $route.params.식별자 이 변수로 데이터를 가져올 수 있음 ($route.fullPath는 전체경로) : $route는 URL 관련 정보
+
+cf) $router 는 페이지 이동 관련임($route는 URL 관련 정보)
+$router.push('상대경로')는 페이지이동 $router.go(n)는 n 앞으로 가기 -n을 하면 n만큼 뒤로가기
+
+예를 들어 detail에서 해당 comment로 넘어갈 경우 <p @click="$router.push($route.params.id + '/comment')"> 이때 detail이 기준이기 때문에 중간에 식별자가 또 있어야 함
+
+그밖에 여러 기능은 https://next.router.vuejs.org/
+참고를 위해 Vue 강의때 본 routerplus 첨부 (createWebHashHistory 이용한 Hashmode라던가 beforeEnter: ()=>{}로 라우팅 사이 검사등을 처리하는 네비게이션 가드 등)
