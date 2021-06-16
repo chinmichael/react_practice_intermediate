@@ -33,6 +33,11 @@ ReactDOM.render(
 >> HashRouter는 라우팅을 안전하게 해줌 (서버에 GET요청을 하는걸 주소에 #을 넣으므로서 원천적으로 차단시켜버림 (서버는 # 뒤의 것을 서버로 전달하지 않음))
 >> 물론 서버에서 라우팅을 React 등에 일임하게 설정하면 그냥 BrowserRouter해도 됨
 
+App.js에서 
+import { Link, Route, Switch } from 'react-router-dom'
+
+Route
+
 
 ==============================================================================================
 
@@ -111,7 +116,21 @@ createApp(App).use(router).mount('#app')
 
 React router 기본 사용법
 
+App에서 위 3개 컴포넌트 import한 뒤
 
+<Route path="경로">
+    페이징 이동해 보여줄 HTML
+</Route>
+
+<Route path="경로" component={}> //로 컴포넌트를 깔끔하게 한 태그로 넣을 수도 있음
+</Route>
+
+문제는 기본 Route는 매칭이 되는건 다 보여줌 ("/detail"의 경우 "/"와 "/detail"을 보여줌)
+속성 'exact'를 '/'경로에 추가하면 됨
+<Route exact path="/"></Route>
+
+cf) 눈여겨 볼것 >> React나 Vue로 만드는 Web-app은 html 파일이 결국 index.html 한개가 됨
+                >> React Router는 HTML 내부 내용을 해당 설정으로 재랜더링해 다른 페이지처럼 보여주는것 
 
 ==============================================================================================
 
