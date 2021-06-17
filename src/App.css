@@ -3,3 +3,13 @@
     background-size: cover;
     color: white;
 }
+
+.router-link {
+    text-decoration: none;
+    color: white;
+}
+
+.router-link:hover {
+    text-decoration: none;
+    color: #eee;
+}
