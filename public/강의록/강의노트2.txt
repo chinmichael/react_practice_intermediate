@@ -169,7 +169,7 @@ path에 해당하는 컴포넌트 중에서 하나만을 보여주게 할때(중
 
 URL 파라미터 :id >> '/detail/:param' 으로 <Route path>에 넣을 경우
 detail 뒤에 param 부분에 무엇이 들어가던 /detail 페이지로 이동,
-param 부분은 :작명 한 파라미터로 하여 값을 보내준다 >> 상품 아이디 등을 보낼때 사용
+param 부분을 파라미터로 하여 값을 보내준다 >> 상품 아이디 등을 보낼때 사용
 
 >> 하위 컴포넌트에서 사용은 import {useParams} from 'react-router-dom';에서의 useParams Hook을 사용한다(최신문법)
 >> let { id } = useParams(); >> useParams에 URL 파라미터가 Object로 저장됨 >> 순서대로 {}에 key를 지정한다. (이렇게 저장된 Object의 각 항목을 변수에 저장하는걸 destructing 문법)
