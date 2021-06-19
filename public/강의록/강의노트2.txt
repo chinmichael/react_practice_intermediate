@@ -150,9 +150,12 @@ props할 것이 있다면 기존처럼 하면 됨 >> data.js를 import해도 되
 >> css는 그냥 클래스 만들어서 하자
 
 
-근데 버튼 등으로 라우터 이동을 할 경우 : <Link>가 아니라
++ 참고로 부트스트랩 <Nav.Link>안에 <Link>로 두면 둘다 <a>로 읽어서 <a> 중복이 되어버린다. >> <Nav.Link>에 to 속성과 함께 as={ Link }를 사용하면 된다. (as는 react-bootstrap문법)
 
-뒤로 가기 등을 처리할 때 >> react-router-dom의 useHistory 함수를 가져와서
+
+근데 버튼 등으로 라우터 이동을 할 경우, 뒤로가기 등을 할 때는 : <Link>가 아니라
+
+뒤로 가기 등을 처리할 때 >> react-router-dom의 useHistory HOOK 함수를 가져와서
 >> let history = useHistory();를 하면 방문기록 오브젝트가 생김 >> history.goBack()을 하면 뒤로감 (리액트 라우터 라이브러리 구글링)
 >> history.push('경로') 하면 경로 이동 가능
 
@@ -194,6 +197,10 @@ $router.push('상대경로')는 페이지이동 $router.go(n)는 n 앞으로 가
 그밖에 여러 기능은 https://next.router.vuejs.org/
 참고를 위해 Vue 강의때 본 routerplus 첨부 (createWebHashHistory 이용한 Hashmode라던가 beforeEnter: ()=>{}로 라우팅 사이 검사등을 처리하는 네비게이션 가드 등)
 
+
+++ Vue에서 컴포넌트 가져오기
+1생성한 .vue파일을 가져다 쓸 상위 컴포넌트의 script에다가 import한 뒤 (import Card from "./Card.vue";)
+2components:{Card: Card}에 등록한다
 
 
 

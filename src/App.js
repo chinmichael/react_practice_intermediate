@@ -39,8 +39,10 @@ function App() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
-            <Nav.Link><Link className="router-link" to="/">Home</Link></Nav.Link>
-            <Nav.Link><Link className="router-link" to="/detail/1">Detail</Link></Nav.Link>
+            {/* <Nav.Link><Link className="router-link" to="/">Home</Link></Nav.Link>
+            <Nav.Link><Link className="router-link" to="/detail/1">Detail</Link></Nav.Link> */}
+            <Nav.Link as={Link} to="/" className="router-link">Home</Nav.Link>
+            <Nav.Link as={Link} to="/detail/1" className="router-link">Detail</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Navbar>
@@ -125,7 +127,7 @@ function ProductList(props) {
   return (
     <Col md={4}>
       <img src={`https://codingapple1.github.io/shop/shoes${props.cnt}.jpg`} width="100%"></img>
-      <h4>{props.pro_list.title}</h4>
+      <Link to={`/detail/${props.pro_list.id + 1}`}><h4>{props.pro_list.title}</h4></Link>
       <p>{props.pro_list.content} & {props.pro_list.price}</p>
     </Col>
   );

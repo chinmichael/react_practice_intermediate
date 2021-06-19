@@ -1,11 +1,11 @@
+/* eslint-disable */
 import './Detail.scss'; // css import는 그냥 이렇게 경로만
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { useHistory, useParams } from 'react-router-dom';
 
 import styled from 'styled-components';
-
 const TitleBox = styled.div`
     padding : 20px;
 `;
@@ -15,6 +15,19 @@ const TitleParam = styled.h4`
 `;
 
 function Detail(props) { // props가 아니라 여기에 data.js를 import해도 되나, 중요 데이터는 root인 App에 저장하는게 정석
+
+    let [alertIf, alertDelete] = useState(true);
+    let [tempInput, tempChange] = useState('');
+
+    useEffect(() => {
+        console.log('useEffect test');
+        let timer = setTimeout(() => { // setTimeout()은 변수로 저장하는 경우가 많음 (삭제하거나 할 상황들이 생기기 때문에)
+            alertDelete(false);
+        }, 3000);
+
+        return () => { clearTimeout(timer); }
+    }, [alertIf]);
+
     //let cnt = 1;
     let history = useHistory(); // useState같은 hook과 같은 것 >> history변수 안에 방문기록 오브젝트가 들어감
 
@@ -33,13 +46,20 @@ function Detail(props) { // props가 아니라 여기에 data.js를 import해도
 
     return (
         <Container style={{ textAlign: 'center' }}>
+            <input type='text' onChange={(e) => { tempChange(e.target.value) }} />
+            <div>{tempInput}</div>
             <TitleBox>
                 <TitleParam titleColor="red">Detail</TitleParam>
                 {/* titleColor={ }로 데이터 바인딩도 가능 */}
             </TitleBox>
-            <div className="my-alert-red">
-                <p>재고가 얼마 남지 않았습니다.</p>
-            </div>
+            {
+                alertIf === true
+                    ? (<div className="my-alert-red">
+                        <p>재고가 얼마 남지 않았습니다.</p>
+                    </div>)
+                    : null
+            }
+
             <Row>
                 <Col md={6}>
                     <img src={`https://codingapple1.github.io/shop/shoes${id}.jpg`} width="100%"></img>

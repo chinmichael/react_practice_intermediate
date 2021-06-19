@@ -1,0 +1,157 @@
+React Lifecycle Hook
+
+컴포넌트 Lifecycle : 컴포넌트 생성, 업데이트(재랜더링), 삭제
+
+>> 이 사이사이에 Hook을 걸 수가 있음
+>> 예를 들어 생성 전에 서버에 업데이트 할 데이터가 있는지 Ajax로 확인한다거나
+
+React Lifecycle Hook 사용법
+
+1. class 컴포넌트의 경우
+
+class Detail extends React.Component {
+    copmonentDidMount() { // 컴포넌트가 마운트 되었을(생성될) 때 실행될 코드 입력
+
+    }
+    componentWillUnmount() { //컴포넌트가 삭제될 때 실행될 코드 입력
+
+    }
+}
+
+>> 이런식으로 지정된 Hook함수를 사용
+
+2. 함수형 컴포넌트를 사용할 경우(React 16 이후)
+
+import React, { useState, useEffect } from 'react' //로 useEffect를 가져온 뒤
+
+useEffect(callback);
+
+useEffect는 컴포넌트가 mount, update 될 때 실행이 됨
+만약 컴포넌트가 삭제될 때(unmount) 실행시키고 싶다면 return callback 으로 설정하면 됨
+
+그리고 useEffect()는 한 컴포넌트 함수에 여러개를 세팅할 수 있음 (대신 실행 순서는 위에서 아래로)
+
+
+문제는 mount랑 update 양쪽다 실행이 되므로 버그가 터질 수 있음
+
+useEffect(callback, [조건]); >> 두번째 파라미터로 조건 넣을 수 있음
+예를 들어 useEffect(callback, [state명])을 하면 해당 state가 변경될때만 실행됨 (해당 state를 먼저 선언해야 한다 (호이스팅 안됨?))
+
+만약 그냥 []만 둔다면 >> 변경 조건에 해당하는 state가 없으므로 update시에는 실행되지 않는, mount시에만 실행되는 useEffect()가 된다
+참고로 []안에 해당 state는 ','를 이용해 여러개를 지정할 수 있음
+
+
+★☆★ 타이머 사용시 중요한 점
+setTimeout을 변수로 저장하는 이유기도 함 
+만약 setTimeout의 지정 시간 이전에 뒤로가기 등을 처리하고 다시 들어올 경우 되면 실행 코드에 따라 꼬이는 상황들이 발생 가능
+
+따라서 unmount 시점에 타이머를 제거해줘야 한다. >> clearTimeout() 함수를 사용
+
+useEffect(()=>{
+    let timer = setTimeout(()=>{}, 3000);
+
+    return ()=> { clearTimeout(timer) };
+}, [])
+
+
+
+
+
+=======================================================================================================
+=======================================================================================================
+
+Vue에서의 Lifecycle 함수를 사용법은 (https://wormwlrm.github.io/2018/12/29/Understanding-Vue-Lifecycle-hooks.html)
+methods: {
+    beforeCreate(){
+
+    }, // Vue인스턴스가 초기화된 직후 실행 >> 컴포넌트가 DOM에 추가되기 전이라 data,mothods 등 접근이 안됨
+    created() {
+
+    }, // 초기화된 인스턴스 주입이 이뤄져 data, computed, methods, watch등 활성 후 실행되기에 접근이 가능해짐 (Ajax요청으로 data를 가져오는 등에 적합)
+    beforeMount() {
+
+    }, // 템플릿 생성 유무를 확인한 뒤 가상 DOM에 랜더링이 되었으나 실제 DOM에 부착하기 전임
+    Mounted() {
+
+    }, // 실제 DOM에 부착이된, 컴포넌트가 완전히 생성된 이후에 실행 (모든 요소 접근 가능 beforeMount는 this.본인변수에 접근이 안됨) + 상위컴포넌트 mounted훅은 하위 컴포넌트 mounted훅 이후 실행
+    beforeUpdate() {
+
+    }, // data(){}에 변동사항이 생겨 업데이트하여 가상DOM을 재랜더링하기 전에 호출됨 + 변동된 data에 아직 접근이 불가능 + 훅에서 값을 추가로 변경해도 랜더링 추가 호출이 되진 않음
+    updated() {
+
+    }, // 가상 DOM 랜더링 이후 실제 DOM 변경 이후 호출, 변경된 data 접근이 되지만 변경 data를 다시 변경하는 경우 무한루프를 일으키므로 직접변경을 하면 안됨
+    beforeDestroy() {
+
+    }, // 인스턴스가 완전히 해제되기 직전에 호출 >> 모든 속성 접근 가능 >> 이벤트리스너 해제 등의 인스턴스 삭제 전에 일을 처리하면 됨
+    detroyed() {
+
+    } // 인스턴스 해체 직후에 호출 >> 인스턴스 속성 접근, 하위 인스턴스 접근 불가
+}
+
+상위컴포넌트 mounted훅은 하위 컴포넌트 mounted훅 이후 실행
+상위컴포넌트 created >> 하위컴포넌트 created >> 하위컴포넌트 mounted >> 상위컴포넌트 mounted (하위 컴포넌트 생성과 마운트가 완료되야 마운트가 됨)
+
+하지만 비동기통신 등의 이유로 상위의 mounted훅이 하위의(여기서 비동기통신 발생) mounted 상태 보장을 안할 경우
+상위 mounted(()=>{this.$nextTick(()=>{})})을 통해 랜더링이 완료된 상태로 실행시킴으로서 마운트 상태 보장가능
+
+updated에도 this.$nextTick()을 이용해 랜더링 완료된, 모든 화면 업데이트 된 이후 상태 보장 가능
+
+
+=======================================================================================================
+=======================================================================================================
+
+++ ) React class lifecycle hook 좀더 상세히 (https://velog.io/@st2702/React-Lifecycle-%EC%83%9D%EB%AA%85%EC%A3%BC%EA%B8%B0)
+
+라이프사이클 이미지 반드시 참조할 것
+
+컴포넌트 Mount (컴포넌트가 처음 실행되는 것, 생성)
+
+constructor(props) {
+    super(props);
+}
+생성자 함수 >> 초기화 시 호출 (state를 여기에 넣고 설정)
+
+componentWillMount : render가 되기 직전 호출되는 (브라우저가 아닌 환경에서도 호출) Hook함수였으나 react 17부터 사라짐
+
+getDerivedStateFromProps은 업데이트 뿐 아니라 마운트 되기 전에도 생성자 이후 state 접근이 가능해진 뒤에 호출됨
+
+componentDidMount() {
+
+} // 컴포넌트가 랜더링된 다음 호출됨 >> DOM관련 작업, Ajax요청, fetch, 외부 라이브러리 연동 등에 사용
+
+====================================================================================================
+
+컴포넌트 Update
+
+componentWillReceiveProps(nextProps) : 컴포넌트 생성 후 첫 랜더링을 마친 후 호출되는 함수 / props를 받아 state를 변경할 때 유용 / react 17부터 사라짐
+getDerivedStateFromProps(nextProps, preState)로 대체 setState가 아닌 return으로 변경사항 반환(null은 변경 없음)
+
+static getDerivedStateFromProps(nextProps, prevState) {
+  if (prevState.name !== nextProps.name) {
+    return { name: nextProps.name };
+  }
+
+  return null;
+}
+
+shouldComponentUpdate(nextProps, nextState) {
+    return boolean
+} // 컴포넌트 업데이트 직전호출, props나 state변경시 리랜더링 여부를 return으로 정함
+
+componentWillUpdate : 위 함수 이후 컴포넌트 업데이트 직전 호출, setState를 하면 무한루프가 발생 react 17부터 사라짐
+
+componentDidUpdate(preProps, preState) {
+
+} // 컴포넌트 업데이트 직후(랜더링 된 뒤에) 호출
+
+========================================================================================================
+
+컴포넌트 삭제
+
+componentWillUnmount() {
+
+} // 컴포넌트가 DOM에서 삭제된 후 실행
+
+
+// ... 흠 갠적으로 Vue 라이프사이클이 더 직관적인거 같아
+// ... useEffect가 왜 나왔는지 기분을 알것다...
