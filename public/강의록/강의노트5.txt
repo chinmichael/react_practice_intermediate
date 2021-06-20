@@ -1,0 +1,102 @@
+Ajax 요청
+
+Ajax = Asynchronous Javascript And XML
+비동기 통신으로 서버에 동기요청으로 페이지를 새로고침하지 않고 처리할 수 있음
+
+사용방법
+1. jQuery라이브러리의 $.ajax()
+2. axios 라이브러리로 (Vue, React에서 많이 사용) >> 호환성이 좋음
+3. es6 이후 바닐라JS의 fetch()
+
+axios 설치
+npm install axios
+
+라이브러리 사용법에 따른 import
+import axios from 'axios'
+
+>> get요청의 경우 axios.get('경로')
+    .then(callbakc) // 요청 성공시 (result) => { console.log(result.data) } .data에 해당 데이터 들어가있음
+    .catch(callback); // 요청 실패시  console.error('요청 오류', err)이런거 쓰겠지
+
+>> fetch('경로').then().catch();도 비슷 근데 fetch의 경우 JSON에 가져온 data를 Object로 변환해줘야함
+
+POST 요청의 경우
+axios.post('경로', data) //>> data는 Object형식 (header 설정 등도 가능) 
+.then().catch();
+
+axios({
+                method:"POST",
+                url: '경로'
+                data:{
+                    "name":"~"
+                }
+            }).then((res)=>{
+                console.log(res);
+            }).catch(err=>{
+                console.log(err);
+                throw new Error(err);
+            });
+
+axios({
+  method: 'post',
+  url: '경로',
+  data: { id: 'chin', pw: '1234' },
+  headers: { 'Content-Type': 'application/json' },
+})
+  .then( response => { console.log(response) } )
+  .catch( err => { console.log(err) } );
+이런 식으로도 가능하다 어느쪽이나 data부분이 body임
+
+axios.delete("경로").then(function(response){
+    console.log(response);
+      }).catch(err=>{
+        console.log(err);
+        throw new Error(err);
+}
+
+
+
+============================================================================
+
+컴포넌트 로드 시 Ajax 요청할 경우
+
+useEffect()를 사용하면 됨
+
+============================================================================
+
+JSON = 데이터 포맷 JavaScript Object Notation
+
+말그대로 JS의 Object형태지만 text로 전달이 되기 때문에 key들도 전부 ""문자열 처리가 됨 >> 변환이 필요 (axios는 JSON을 Object로 알아서 처리해줌)
+
+Ajax는 JSON으로 데이터 가져와 줌
+
+=========
+
+chokidar.js: 'return' outside of function. (4:1) 문제 터짐 혹시 자동 import 등으로 잘못가져와진 라이브러리가 있는지 확인...
+
+++ ) 팁 let list = [...original, ...result.data]; 이런식으로 가져온 오브젝트 배열을 spread 연산자를 이용하여 한번에 붙여버릴 수도 있다. (Object도 가능)
+
+++ ) Ajax요청 중 로딩창을 만들려면??
+>> 요청 이벤트에 모달창 등의 로딩창 UI를 띄우게 한 후 >> then이나 catch에서 이 로딩창이 삭제되게 한다. (모달창 배경은 z-index 이용)
+
+
++=====================================================================
+
+react font awesome 사용법 (https://fontawesome.com/v5.15/how-to-use/on-the-web/using-with/react) 참조함
+
+기본 설치(3개 다)
+npm install --save @fortawesome/fontawesome-svg-core
+npm install --save @fortawesome/free-solid-svg-icons
+npm install --save @fortawesome/react-fontawesome
+
+추가 스타일 설치
+npm install --save @fortawesome/free-brands-svg-icons
+npm install --save @fortawesome/free-regular-svg-icons
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCoffee } from '@fortawesome/free-solid-svg-icons'
+
+<FontAwesomeIcon icon={faCoffee} />
+
+
++=====================================================================

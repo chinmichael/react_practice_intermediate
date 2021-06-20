@@ -10,9 +10,22 @@ import { product } from './ref/data.js'
 import { countBy } from 'lodash';
 import Detail from './Detail.js';
 
-function App() {
+import axios from 'axios';
+import { useEffect } from 'react';
 
-  let [product_data, product_change] = useState(product);
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCompass } from '@fortawesome/free-solid-svg-icons'
+
+function App() {
+  let [original, originalChange] = useState(product);
+  let [product_data, product_change] = useState(original);
+  let [loading, loadingChange] = useState(false);
+
+  let timer;
+
+  useEffect(() => {
+    return () => { clearTimeout(timer) };
+  }, [])
 
   function product_list() {
     let list = [];
@@ -34,6 +47,12 @@ function App() {
 
   return (
     <div className="App">
+      {
+        loading === true
+          ? <LoadingModal></LoadingModal>
+          : null
+      }
+
       <Navbar bg="dark" expand="lg" variant="dark">
         <Navbar.Brand href="#home">React Ex</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -79,7 +98,7 @@ function App() {
 
               {/* 최종적으로 map(혹은 for문으로 해도 됨 map이 더 직관적) + props + 컴포넌트 이용 */}
               {
-                product.map((pro_list, i) => {
+                product_data.map((pro_list, i) => {
                   return (
                     <ProductList pro_list={pro_list} cnt={i + 1} key={i}></ProductList>
                   )
@@ -104,8 +123,31 @@ function App() {
           </Col> */}
               {/* 오랜만의 보는 부트스트랩 기본 반응형 문법 : container랑 row로 감싸고 col을 총 12가 되게 나눔 (md, lg등은 기준) */}
             </Row>
-          </Container>
+            <Button variant="primary" onClick={() => {
 
+              loadingChange(true);
+
+              axios.get('https://codingapple1.github.io/shop/data2.json')
+                .then(result => {
+                  //let newProduct = result.data;
+                  //console.log(newProduct);
+
+                  // let list = [...original];
+                  // newProduct.map((element) => {
+                  //   list.push(element);
+                  // });
+                  let list = [...original, ...result.data]; // 이런식으로 한번에 합칠 수도 있다.
+
+                  //console.log(list);
+                  product_change(list);
+                  timer = setTimeout(() => { loadingChange(false) }, 5000);
+                })
+                .catch((err) => {
+                  console.error('요청 오류', err);
+                  loadingChange(false);
+                });
+            }}>더보기</Button>
+          </Container>
         </Route>
 
 
@@ -131,6 +173,17 @@ function ProductList(props) {
       <p>{props.pro_list.content} & {props.pro_list.price}</p>
     </Col>
   );
+}
+
+function LoadingModal() {
+  return (
+    <div className="loading-back">
+      <div className="loading-window">
+        <FontAwesomeIcon icon={faCompass} className="loading-icon" />
+        <h4>Now Loading...</h4>
+      </div>
+    </div >
+  )
 }
 
 export default App;
