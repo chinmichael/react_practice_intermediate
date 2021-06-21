@@ -1,0 +1,110 @@
+React 프로젝트 빌드하는 방법
+
+package.json에서 homepage key를 추가한 뒤
+"homepage": "배포될 경로"를 입력한다 (만약 https://cover.com/blog)와 같이 하위 경로로 배포될 경우는 이 설정이 반드시 필요함(옆처럼 입력하거나 "/blog"로 해도 됨)
+
+npm run build (혹은 yarn build)로 빌드 파일를 만들어 JSX나 컴포넌트 등의 파일이 순수 HTML,CSS,JS로 잘 컴파일 된 빌드 파일 생성
+
+프로젝트 폴더 내 생성된 빌드 폴더의 index.html, css, js를 모두 폴더 채 서버에 올린다.
+
+이후 서버에서 home 링크로 접속할 시 위의 build/index.html의 파일을 전송시키는 것으로 서버 API를 작성
+
+(업데이트 할꺼면 build 다시 하고 서버에 재업로드 (build할 때마다 js와 css파일명은 무작위로 생성되어 새로운 css,js에 접근이 됨))
+
+build시 압축시키지 않을 파일들은 public에 넣고 루트경로(/)로 해서 가져오면 되는데... 
+
+======================================================================================================================================================
+======================================================================================================================================================
+
+Tab UI + Animation
+
+Tab은 사실 Modal창 3개라고 생각하면 더 편하다
+
+Tab 개수만큼 <button>등을 만들고 그만큼 보여줄 <div>를 만든 뒤에 state로 보여줄 상태를 지정함
+tab 버튼 디자인은 react-bootstrap의 base nav를 검색해 참고하면 좋다.
+
+참고로 base nav의 tab의 경우 react-bootstrap문법으로
+<Nav.Link>의 eventKey="0"로 각 탭의 key를 지정하고
+<Nav> 의 defaultActiveKey="0"로 기본 세팅 key를 지정가능
+
+공부할 겸 간단히 직접 구현해봤는데 (Detail.js 참조)
+
+<div className="tab-container">
+                <div className="tab-flex">
+                    <div className={"tab-btn" + " " + tabBtn[0]} onClick={() => { changeTab(0); }}>Tab1</div>
+                    <div className={"tab-btn" + " " + tabBtn[1]} onClick={() => { changeTab(1); }}>Tab2</div>
+                    <div className={"tab-btn" + " " + tabBtn[2]} onClick={() => { changeTab(2); }}>Tab3</div>
+                    <div style={{ flexGrow: "10", borderBottom: "1px solid #eee" }}></div>
+                </div>
+                <div className="tab-contents">
+                    <TabContents tab={tab}></TabContents>
+                </div>
+            </div>
+
+이제 tab state에 따라 보여줄 div의 경우
+<div className="tab-contents">
+                    <TabContents tab={tab}></TabContents>
+                </div>
+
+기존 return=(JSX) 내부에서도 쓸수 있는 삼항연산자의 경우 3개 이상이 되면 꽤 골치 아파진다.
+
+따라서 하위 컴포넌트를 만들고 JSX 이전에
+const TabContents = (props) => {
+    switch (props.tab) {
+        case 0:
+            return (
+                <div>tab 1</div>
+            );
+        case 1:
+            return (
+                <div>tab 2</div>
+            )
+        default:
+            return (
+                <div>tab 3</div>
+            );
+
+    }
+}
+
+다음과 같이 switch case 문이나(Java랑 똑같이 굴러감) if문을 사용해 return 부분만 JSX를 입력하면 if나 switch문 사용 가능
+
+======================================================================================================================================================
+
+애니메이션은 그냥 css 작업에 가까움
+
+근데 애니메이션은 기존처럼 사실 애니메이션을 줄 CSS class를 만들고
+className={}처럼 데이터 바인딩으로 필요한 상황에 따라 class를 붙여주거나 떼주면 됨
+기존 jQuery addClass나 removeClass보다 편하다.
+
+<< 이게 정석임
+
+굳이 사용하지 않아도 되지만 라이브러리 사용해서 좀 더 편히(?) 해도 됨
+npm install react-transition-group
+
+import { CSSTransition } from 'react-transition-group';을 한뒤 사용
+>> 컴포넌트 등장, 업데이트 시 transition을 간단히 줄 수 있음
+
+<CSSTransition in={} classNames="ani" timeout={}>
+    <애니메이션 주고 싶은 컴포넌트>
+</CSSTransition>
+
+각 props의 경우 timeout은 애니메이션 동작 시간(밀리세컨) in={bool}은 boolean으로 작용하는 일종의 스위치 classNames="ani"은 애니메이션을 지정할 셀렉터
+그래서 시작 애니메이션의 경우 위 셀렉터를 기준으로 css 파일에
+
+.ani-enter { // 애니메이션 시작에 사용될 css
+    opacity: 0;
+}
+
+.ani-enter-active { // 애니메이션 동작에 사용될 css
+    opacity: 0;
+    transition: all 1s;
+}
+
+이렇게 두 클래스를 정의하고 transition을 주면된다
+
+이후 bool에 해당하는 state를 default는 false로 하여 저장한 뒤
+해당 하위 컴포넌트의 useEffect(()=>{props.boolChange(true)});로 생성 및 업데이트 시 동작하게 하고
+동시에 상위 컴포넌트에서 해당 이벤트시 다시 onClick={()=>{boolChange(false)}}로 하여 끄게 만든다 
+
+(그냥 css 작성하는거랑 큰 차이가 없는거 같은디...)

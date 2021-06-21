@@ -6,13 +6,17 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-import { HashRouter } from 'react-router-dom';
+//import { HashRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.render(
   <React.StrictMode>
-    <HashRouter>
+    {/* <HashRouter>
       <App />
-    </HashRouter>
+    </HashRouter> */}
+    <BrowserRouter basename="">
+      <App />
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root') // html의 id="root" 요소에 위 App을 넣어라
 );

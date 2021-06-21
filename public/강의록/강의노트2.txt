@@ -33,6 +33,9 @@ ReactDOM.render(
 >> HashRouter는 라우팅을 안전하게 해줌 (서버에 GET요청을 하는걸 주소에 #을 넣으므로서 원천적으로 차단시켜버림 (서버는 # 뒤의 것을 서버로 전달하지 않음))
 >> 물론 서버에서 라우팅을 React 등에 일임하게 설정하면 그냥 BrowserRouter해도 됨
 
+참고로 <BrowserRouter basename=""></BrowserRouter>에 basename(ex: "/exercise")을 설정하면 모든 라우터 이동 앞에 저게 붙음
+그리고 없더라도 basename=""로 일단 지정하는 것이 build 이후 라우터 이동에 좀 더 문제가 없을 것임
+
 App.js에서 
 import { Link, Route, Switch } from 'react-router-dom'
 

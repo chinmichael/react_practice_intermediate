@@ -1,7 +1,7 @@
 /* eslint-disable */
 import './App.css';
 import React from 'react';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 
 import { Link, Route, Switch } from 'react-router-dom'
 
@@ -16,10 +16,15 @@ import { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCompass } from '@fortawesome/free-solid-svg-icons'
 
+export let stockContext = React.createContext();
+//export let stockChangeContext = React.createContext();
+
 function App() {
   let [original, originalChange] = useState(product);
   let [product_data, product_change] = useState(original);
   let [loading, loadingChange] = useState(false);
+
+  let [stock, stockChange] = useState([10, 11, 12]);
 
   let timer;
 
@@ -81,12 +86,15 @@ function App() {
           </Jumbotron>
 
           <Container style={{ textAlign: 'center', }}>
-            <Row>
 
-              {/* {product_list()} */}
-              {/* 실행을 위해 ()을 붙이는거 유의 아래는 map으로 처리한 경우 */}
+            <stockContext.Provider value={stock}>
 
-              {/* {product.map((pro_data, i) => {
+              <Row>
+
+                {/* {product_list()} */}
+                {/* 실행을 위해 ()을 붙이는거 유의 아래는 map으로 처리한 경우 */}
+
+                {/* {product.map((pro_data, i) => {
             return (
               <Col md={4}>
                 <img src={`https://codingapple1.github.io/shop/shoes${i + 1}.jpg`} width="100%"></img>
@@ -96,17 +104,17 @@ function App() {
             )
           })} */}
 
-              {/* 최종적으로 map(혹은 for문으로 해도 됨 map이 더 직관적) + props + 컴포넌트 이용 */}
-              {
-                product_data.map((pro_list, i) => {
-                  return (
-                    <ProductList pro_list={pro_list} cnt={i + 1} key={i}></ProductList>
-                  )
-                })
-              }
+                {/* 최종적으로 map(혹은 for문으로 해도 됨 map이 더 직관적) + props + 컴포넌트 이용 */}
+                {
+                  product_data.map((pro_list, i) => {
+                    return (
+                      <ProductList pro_list={pro_list} cnt={i + 1} key={i}></ProductList>
+                    )
+                  })
+                }
 
 
-              {/* <Col md={4}>
+                {/* <Col md={4}>
             <img src="https://codingapple1.github.io/shop/shoes1.jpg" width="100%"></img>
             <h4></h4>
             <p></p>
@@ -121,8 +129,11 @@ function App() {
             <h4></h4>
             <p></p>
           </Col> */}
-              {/* 오랜만의 보는 부트스트랩 기본 반응형 문법 : container랑 row로 감싸고 col을 총 12가 되게 나눔 (md, lg등은 기준) */}
-            </Row>
+                {/* 오랜만의 보는 부트스트랩 기본 반응형 문법 : container랑 row로 감싸고 col을 총 12가 되게 나눔 (md, lg등은 기준) */}
+              </Row>
+
+            </stockContext.Provider>
+
             <Button variant="primary" onClick={() => {
 
               loadingChange(true);
@@ -150,10 +161,16 @@ function App() {
           </Container>
         </Route>
 
+        <stockContext.Provider value={{ stock: stock, stockChange: stockChange }}>
+          {/* <stockChangeContext.Provider value={stockChange}> */}
 
-        <Route path='/detail/:id'>
-          <Detail product={product_data}></Detail>
-        </Route>
+          <Route path='/detail/:id'>
+            <Detail product={product_data}
+            // stock={stock} stockChange={stockChange}
+            ></Detail>
+          </Route>
+          {/* </stockChangeContext.Provider> */}
+        </stockContext.Provider>
 
         {/* <Route path="/:id">
           <div>임시</div>
@@ -166,11 +183,15 @@ function App() {
 }
 
 function ProductList(props) {
+
+  //let stock = useContext(stockContext);
+
   return (
     <Col md={4}>
       <img src={`https://codingapple1.github.io/shop/shoes${props.cnt}.jpg`} width="100%"></img>
       <Link to={`/detail/${props.pro_list.id + 1}`}><h4>{props.pro_list.title}</h4></Link>
       <p>{props.pro_list.content} & {props.pro_list.price}</p>
+      <Test index={props.cnt - 1}></Test>
     </Col>
   );
 }
@@ -183,6 +204,14 @@ function LoadingModal() {
         <h4>Now Loading...</h4>
       </div>
     </div >
+  )
+}
+
+const Test = (props) => {
+  let stock = useContext(stockContext);
+
+  return (
+    <p>재고 : {stock[props.index]}</p>
   )
 }
 

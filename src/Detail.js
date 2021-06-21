@@ -1,11 +1,17 @@
 /* eslint-disable */
 import './Detail.scss'; // css import는 그냥 이렇게 경로만
 
-import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import React, { useEffect, useState, useContext } from 'react';
+import { Container, Row, Col, Button, Nav } from 'react-bootstrap';
 import { useHistory, useParams } from 'react-router-dom';
 
 import styled from 'styled-components';
+
+//import { stockContext, stockChangeContext } from './App.js';
+import { stockContext } from './App.js';
+
+import { CSSTransition } from 'react-transition-group';
+
 const TitleBox = styled.div`
     padding : 20px;
 `;
@@ -18,6 +24,20 @@ function Detail(props) { // props가 아니라 여기에 data.js를 import해도
 
     let [alertIf, alertDelete] = useState(true);
     let [tempInput, tempChange] = useState('');
+
+    let stock = useContext(stockContext);
+    //let stockChange = useContext(stockChangeContext);
+
+    let [tab, tabChange] = useState(0);
+    let [tabBtn, tabBtnChange] = useState(['tab-selected', '', '']);
+    let [tabAni, tabAniSwitch] = useState(false);
+
+    function changeTab(num) {
+        tabChange(num);
+        let temp = ['', '', ''];
+        temp[num] = 'tab-selected';
+        tabBtnChange(temp);
+    }
 
     useEffect(() => {
         console.log('useEffect test');
@@ -39,10 +59,11 @@ function Detail(props) { // props가 아니라 여기에 data.js를 import해도
     // java처럼 indexOf(데이터, fromIndex), lastIndexOf(데이터, fromIndex)를 사용한다
     // 객체 배열의 경우 findIndex(콜백함수)를 사용한다. >> callback(elements, index, array) 각 인자는 사용된 배열에서 받아온다.
     // findIndex도 반환값은 판별함수 만족 index (없으면 -1) + 찾자마자 바로 반환
-    const index = props.product.findIndex(x => x.id == (id - 1));
+    //const index = props.product.findIndex(x => x.id == (id - 1));
 
     // 만약 해당 Object를 직접 찾는다면 find() 함수 사용
     const each_product = props.product.find(x => x.id == (id - 1)); // index가 아닌 해당 element가 반환
+    const index = props.product.findIndex(x => x.id == (id - 1));
 
     return (
         <Container style={{ textAlign: 'center' }}>
@@ -60,7 +81,7 @@ function Detail(props) { // props가 아니라 여기에 data.js를 import해도
                     : null
             }
 
-            <Row>
+            {/* <Row>
                 <Col md={6}>
                     <img src={`https://codingapple1.github.io/shop/shoes${id}.jpg`} width="100%"></img>
                 </Col>
@@ -71,7 +92,7 @@ function Detail(props) { // props가 아니라 여기에 data.js를 import해도
                     <Button variant="danger">Shipping</Button> &nbsp;
                     <Button variant="warning" onClick={() => { history.goBack() }}>Go Back</Button>
                 </Col>
-            </Row>
+            </Row> */}
 
             <Row>
                 <Col md={6}>
@@ -81,7 +102,21 @@ function Detail(props) { // props가 아니라 여기에 data.js를 import해도
                     <h4 className="pt-5">{each_product.title}</h4>
                     <p>{each_product.content}</p>
                     <p>{each_product.price} 원</p>
-                    <Button variant="danger">Shipping</Button> &nbsp;
+                    <p>재고 : {stock.stock[index]}</p>
+                    {/* <ProductStock
+                        stock={props.stock[index]}
+                    ></ProductStock> */}
+
+                    <Button variant="danger" onClick={() => {
+                        // let temp = [...props.stock];
+                        // temp[index]--;
+
+                        // props.stockChange(temp);
+                        let temp = [...stock.stock];
+                        temp[index]--;
+                        stock.stockChange(temp);
+                    }}>Shipping</Button> &nbsp;
+
                     <Button variant="warning" onClick={() => { history.goBack() }}>Go Back</Button>
                 </Col>
             </Row>
@@ -104,8 +139,69 @@ function Detail(props) { // props가 아니라 여기에 data.js를 import해도
                     );
                 })
             } */}
-        </Container>
+
+            <div className="tab-container">
+                <div className="tab-flex">
+                    <div className={"tab-btn" + " " + tabBtn[0]} onClick={() => { changeTab(0); tabAniSwitch(false); }}>Tab1</div>
+                    <div className={"tab-btn" + " " + tabBtn[1]} onClick={() => { changeTab(1); tabAniSwitch(false); }}>Tab2</div>
+                    <div className={"tab-btn" + " " + tabBtn[2]} onClick={() => { changeTab(2); tabAniSwitch(false); }}>Tab3</div>
+                    <div className='tab-remain'></div>
+                </div>
+                {/* <div style={{ clear: "both" }}></div> */}
+                <div className="tab-contents">
+                    <CSSTransition in={tabAni} classNames="tab-ani" timeout={1000}>
+                        <TabContents tab={tab} switch={tabAniSwitch}></TabContents>
+                    </CSSTransition>
+                </div>
+            </div>
+
+            {/* 그냥 공부할 겸 tab 간단히 직접 구현해봄 */}
+
+            {/* <Nav mt={5} variant="tabs" defaultActiveKey="0">
+                <Nav.Item>
+                    <Nav.Link eventKey="0">Option1</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link eventKey="1">Option2</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link eventKey="2">Option3</Nav.Link>
+                </Nav.Item>
+            </Nav> */}
+
+        </Container >
     );
+}
+
+const ProductStock = (props) => {
+    return (
+        <div>
+            <p>재고 : {props.stock}</p>
+        </div>
+    );
+}
+
+const TabContents = (props) => {
+
+    useEffect(() => {
+        props.switch(true);
+    })
+
+    switch (props.tab) {
+        case 0:
+            return (
+                <div>tab 1</div>
+            );
+        case 1:
+            return (
+                <div>tab 2</div>
+            )
+        default:
+            return (
+                <div>tab 3</div>
+            );
+
+    }
 }
 
 export default Detail;
