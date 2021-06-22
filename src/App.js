@@ -7,8 +7,8 @@ import { Link, Route, Switch } from 'react-router-dom'
 
 import { Navbar, Nav, Jumbotron, Button, Container, Row, Col } from 'react-bootstrap'
 import { product } from './ref/data.js'
-import { countBy } from 'lodash';
 import Detail from './Detail.js';
+import Cart from './Cart.js';
 
 import axios from 'axios';
 import { useEffect } from 'react';
@@ -67,11 +67,13 @@ function App() {
             <Nav.Link><Link className="router-link" to="/detail/1">Detail</Link></Nav.Link> */}
             <Nav.Link as={Link} to="/" className="router-link">Home</Nav.Link>
             <Nav.Link as={Link} to="/detail/1" className="router-link">Detail</Nav.Link>
+            <Nav.Link as={Link} to="/cart" className="router-link">Cart</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Navbar>
 
       <Switch>
+
         <Route exact path='/'>
 
           <Jumbotron className="background" style={{ textAlign: 'center', }}>
@@ -151,7 +153,7 @@ function App() {
 
                   //console.log(list);
                   product_change(list);
-                  timer = setTimeout(() => { loadingChange(false) }, 5000);
+                  timer = setTimeout(() => { loadingChange(false) }, 3000);
                 })
                 .catch((err) => {
                   console.error('요청 오류', err);
@@ -161,20 +163,23 @@ function App() {
           </Container>
         </Route>
 
-        <stockContext.Provider value={{ stock: stock, stockChange: stockChange }}>
-          {/* <stockChangeContext.Provider value={stockChange}> */}
-
-          <Route path='/detail/:id'>
+        <Route path="/detail/:id">
+          <stockContext.Provider value={{ stock: stock, stockChange: stockChange }}>
+            {/* <stockChangeContext.Provider value={stockChange}> */}
             <Detail product={product_data}
             // stock={stock} stockChange={stockChange}
             ></Detail>
-          </Route>
-          {/* </stockChangeContext.Provider> */}
-        </stockContext.Provider>
+            {/* </stockChangeContext.Provider> */}
+          </stockContext.Provider>
+        </Route>
 
         {/* <Route path="/:id">
           <div>임시</div>
         </Route> */}
+
+        <Route path="/cart">
+          <Cart></Cart>
+        </Route>
 
       </Switch>
 

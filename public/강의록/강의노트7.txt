@@ -108,3 +108,77 @@ import { CSSTransition } from 'react-transition-group';을 한뒤 사용
 동시에 상위 컴포넌트에서 해당 이벤트시 다시 onClick={()=>{boolChange(false)}}로 하여 끄게 만든다 
 
 (그냥 css 작성하는거랑 큰 차이가 없는거 같은디...)
+
+만약 CSSTransition에서 ref 워닝이 뜬다면 (StrictMode에서 걸러진 에러)
+const nodeRef = React.useRef(null);로 한뒤
+<CSSTransition>의 nodeRef props를 위의 것으로 지정한다. nodeRef={nodeRef}
+이는 react-transition-group이 내부적으로 더이상 사용되지 않아 StrictMode의 경고가 뜨는 findDOMNode을 사용하기 때문임
+
+======================================================================================================================================================
+
+https://velopert.com/1148
+https://tech.osci.kr/2019/10/10/82068584/
+https://velog.io/@pop8682/%EB%B2%88%EC%97%AD-Refs%EC%99%80-DOM
+
+node의 ref = 리액트 개발에서 DOM에 직접 접근을 할 때 사용하는 것
+
+Refs는 DOM 노드나 React elements에 접근하는 방식을 제공
+일반적으로 React에서 상위컴포넌트가 하위컴포넌트(리액트 컴포넌트 인스턴스나 DOM element)에 상호작용 가능한 수단은 props
+이런 일반적인 데이터흐름(props) 밖에서 컴포넌트 수정이 이뤄질 때
+
+>> input/textarea 등에 포커싱을 할 때 / 특정 DOM 크기를 가져올 때 / 특정 DOM에서 스크롤 위치를 가져오거나 설정할 때 / 외부 라이브러리를 사용할 때
+>> 포커스 관리 혹은 미디어 플레이백 / 애니메이션의 트리거 등
+서드파티(Third Party) : 서트파티는 다른 회사 제품에 이용되는 소프트웨어나 하드웨어를 개발하는 회사
+
+남용하면 안되는 부분이다
+
+일단 Refs 생성은
+React.createRef()를 사용해 생성하고
+this.myRef = React.createRef();
+
+태그의 ref 어트리뷰트를 통해 데이터 바인딩을 하여 지정함
+<div ref={this.myRef} />
+
+이후 노드에 대한 참조는 current 어트리뷰트로 가능해짐
+const node = this.myRef.current;
+
+ref 어트리뷰트가 HTML element에 사용될 때는 React.createRef()로 생성된 ref는 DOM element를 current 프로퍼티를,
+클래스 컴포넌트에 사용되면 마운트된 컴포넌트 인스턴스를 current를
+
+class AutoFocusTextInput extends React.Component {
+	constructor(props) {
+    	super(props);
+        this.textInput = React.createRef();
+    }
+    
+    componentDidMount() {
+    	this.textInput.current.focusTextInput();
+    }
+    
+    render() {
+        return (
+        	<CustomTextInput ref={this.textInput} /> // 마운팅 직후 클릭한다는 가정하에 커스터마이징한 input에 접근하기 위한 ref 사용
+    	);
+  	}
+}
+
+함수형에서는 인스턴스를 갖지 않으므로 ref를 쓰면 안됨 >> 이래서 CSSTransition이 워닝먹은거
+(DOM 요소나 클래스 컴포넌트를 참조한 경우 사용 가능)
+function CustomTextInput(props) {
+    let textInput = React.createRef();
+
+    function handleClick() {
+        textInput.current.focus();
+    }
+
+    return (
+        <div>
+        	<input type="text" ref={textInput} />
+			<input type="button" value="Focus the text input" onClick {handleClick}/>
+      	</div>
+    );
+}
+
+React는 컴포넌트 마운트 시 DOM element와 함께 current프로퍼티 할당 언마운트시 null로 재할당 (componentDidMount, componentDidUpdate 이전에 업데이트)
+
+>> 암만봐도 이건 나중에 책을 사서 보거나 해야겠다

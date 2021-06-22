@@ -29,7 +29,7 @@ function Detail(props) { // props가 아니라 여기에 data.js를 import해도
     //let stockChange = useContext(stockChangeContext);
 
     let [tab, tabChange] = useState(0);
-    let [tabBtn, tabBtnChange] = useState(['tab-selected', '', '']);
+    let [tabBtn, tabBtnChange] = useState(['tab-selected', '']);
     let [tabAni, tabAniSwitch] = useState(false);
 
     function changeTab(num) {
@@ -64,6 +64,8 @@ function Detail(props) { // props가 아니라 여기에 data.js를 import해도
     // 만약 해당 Object를 직접 찾는다면 find() 함수 사용
     const each_product = props.product.find(x => x.id == (id - 1)); // index가 아닌 해당 element가 반환
     const index = props.product.findIndex(x => x.id == (id - 1));
+
+    const nodeRef = React.useRef(null);
 
     return (
         <Container style={{ textAlign: 'center' }}>
@@ -142,14 +144,13 @@ function Detail(props) { // props가 아니라 여기에 data.js를 import해도
 
             <div className="tab-container">
                 <div className="tab-flex">
-                    <div className={"tab-btn" + " " + tabBtn[0]} onClick={() => { changeTab(0); tabAniSwitch(false); }}>Tab1</div>
-                    <div className={"tab-btn" + " " + tabBtn[1]} onClick={() => { changeTab(1); tabAniSwitch(false); }}>Tab2</div>
-                    <div className={"tab-btn" + " " + tabBtn[2]} onClick={() => { changeTab(2); tabAniSwitch(false); }}>Tab3</div>
+                    <div className={"tab-btn" + " " + tabBtn[0]} onClick={() => { changeTab(0); tabAniSwitch(false); }}>상품설명</div>
+                    <div className={"tab-btn" + " " + tabBtn[1]} onClick={() => { changeTab(1); tabAniSwitch(false); }}>배송정보</div>
                     <div className='tab-remain'></div>
                 </div>
                 {/* <div style={{ clear: "both" }}></div> */}
                 <div className="tab-contents">
-                    <CSSTransition in={tabAni} classNames="tab-ani" timeout={1000}>
+                    <CSSTransition nodeRef={nodeRef} in={tabAni} classNames="tab-ani" timeout={1000}>
                         <TabContents tab={tab} switch={tabAniSwitch}></TabContents>
                     </CSSTransition>
                 </div>

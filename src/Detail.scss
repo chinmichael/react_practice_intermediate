@@ -41,14 +41,20 @@ $main-color: #ff0000;
     max-width: 100px;
     width: 30%;
     height: 50px;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #eee;
     cursor: pointer;
     background-color: white;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
 }
+
+$primeblue:#00BFFF;
 
 .tab-selected {
     border-bottom: none;
+    color: $primeblue;
+    font-weight: bold;
 }
 
 
@@ -68,8 +74,11 @@ $main-color: #ff0000;
     height: 300px;
     border: 1px solid #eee;
     border-top: none;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
 
-    padding: 10px;
+    padding: 20px;
 }
 
 .tab-ani-enter { // 애니메이션 시작에 사용될 css

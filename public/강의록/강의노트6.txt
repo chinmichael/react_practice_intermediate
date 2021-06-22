@@ -102,7 +102,129 @@ context 범위 안에 하위 컴포넌트가 여럿 중첩되면 context가 편�
 그리고 한번에 여러 데이터를 보내는 경우 <stockContext.Provider value={{stock: stock, stockChange: stockChange}}> 이렇게 오브젝트 형식으로 넣어
 let stock = useContext(stockContext)을 한 뒤 stock.stock과 같이 뽑아서 사용하면 된다.
 
+주의할 점은 가능한 컴포넌트를 감싸야함
+<Route>등을 감싸다간 뒤에 라우팅이 안되거나 하는 등의 문제가 터질 수 있다.
+(물론 광범위하게 여러 라우터를 감쌀 수도 있겠지만..)
+
 =================================================================================================================================================
 =================================================================================================================================================
 
 Redux 라이브러리 : 모든 컴포넌트에서 state를 공유할 수 있는 통합 관리 공간을 생성한다고 생각
+>> props를 쉽게 쓸수 있고 state(store) 관리가 용이하다
+
+Tip: import 시 {}가 없는건 export default 된 것을 가져온다는 것
+
+1.라이브러리 설치 + store 사용
+
+npm install redux react-redux 로 두개의 라이브러리 설치
+
+redux는 데이터를 엄격히 관리하는 기능
+react-redux는 redux를 react에서 쓸수 있게 보조하는 기능
+
+index.js에서
+import { Provider } from 'react-redux'; 함
+Provider 태그로 감싸진 모든 컴포넌트는 같은 state를 공유할 수 있으므로
+<Provider><App/></Provider>로 루트 컴포넌트를 감싼다
+
+다른 파일에 만들어 import하거나 index.js에 (store.js 참조 Provider 부분만 index.js에 둔다 / store에서 export 시킬 것은 createStore 변수)
+import {createStore} from 'redux';
+let store = createStore(() => {
+    return [{}];로 스테이트를 넣는다. (Redux에서는 state가 아니라 store라고 부름)
+});
+
+그리고 <Provider store={store}>로 Provider 태그의 store 어트리뷰트로 위에서 공유하고자 하는 스테이트 저장소를 공유함 (Context API와 비슷한 역할을 하기에 생긴것도 비슷)
+
+이후 사용할 컴포넌트에서
+
+import { connect } from 'react-redux';
+
+하단에 export defualt 컴포넌트를 주석처리하고
+
+function 함수명(state) { // redux store의 데이터를 가져와 props로 변환해주는 함수
+    return {
+        productName : state.name
+
+        혹은
+
+        state : state로 전부 가져올 수 있음
+
+    } // 오브젝트형으로 리턴
+}
+export default connect(함수명)(컴포넌트명); 으로 처리한다 (store 데이터가 props로 엮인채로 컴포넌트가 export됨)
+
+connect()()이건 거의 라이브러리 사용법에 가까움 connect()가 함수를 return하기에
+
+>> 컴포넌트에서 사용은 위에서 props로 변경되었다고 한 것처럼
+props.state.~로
+
+
+>>> 컴포넌트가 많아지고 깊어져도 props를 여러번 전송하지 않고 state를 직접 갖다 쓸 수 있다.
+
+
+2. redux데이터 변경관리
+
+store데이터를 수정하는 방법을 미리 정의하고 이에 의거한 방법으로만 수정가능하게 처리
+reducer 함수를 사용한다.
+
+위에서 store를 정의했던
+import {createStore} from 'redux';
+let store = createStore(() => {
+    return [{}];로 스테이트를 넣는다. (Redux에서는 state가 아니라 store라고 부름)
+});
+
+이것을 다음과 같이 다시 세분화하여 정의한다.
+
+let 초기값 = [
+    {}, {}, {}
+];
+
+function reducer(state = 초기값, action) {
+    return state
+}
+
+let store = createStore(reducer); 
+
+(순서 중요)
+
+Tip : 참고로 파라미터 안의 state=cart_store는 es6의 default parameter 신문법 | 다른 초기화를 하지 않으면 해당 파라미터의 값의 기본값을 대입연산자 왼쪽 항으로 지정한다.
+
+이후 reducer를 다음과 같이 수정해 데이터 수정이 가능하게 함
+
+function reducer(state=초기값, action) {
+    if(action.type === '수정방법') {
+        updatedState = [...state];
+        updatedState >> 수정 코드
+
+        return updatedState;
+    } else {
+        return state;
+    }
+}
+
+이후 store 사용 컴포넌트에서
+onClick={} 등의 이벤트에서 ()=>{props.dispatch({type : '수정방법'});} 으로 아까 지정한 수정방법을 이용하여 요청한다.
+
+이런 redux는 대형 앱들에 적당함 컴포넌트와 state가 많아도 한번에 관리가 되기 때문에
+특히 reducer로 데이터 수정에 대한 방법을 한 곳에 정리해 놓기 때문에 버그가 났을때 디버깅이 수월해짐
+
+따라서 redux는 상태관리 라이브러리라고 함
+
+
+이제 여러 state에 해당하는 store와 reducer가 필요한 경우
+물론 store 한개에다 [{}[{{}}]] 뭐 이런식으로 다양히 넣을 수 있지만 너무 복잡해짐
+
+그렇다면 해당 state와 reducer함수를 만든 뒤
+
+import {combineReducers, createStore} from 'redux'를 한뒤
+
+let store = createStore(combineReducers({ reducer1, reducer2, ...})) 이런식으로 넣어준 뒤 처리한다
+
+이후 store에서 데이터를 뽑아 쓸때 위에서 combineReducers에서 reducer들을 object로 넣었으므로
+
+function storeProps(state) {
+    return{
+        state1 : state.reducer1;
+    }
+}
+
+이와 같이 뽑아서 저장해 사용한다.
