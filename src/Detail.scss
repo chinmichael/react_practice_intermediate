@@ -6,31 +6,48 @@ $main-color: #ff0000;
     color: $main-color;
 }
 
-@mixin alert{
-    background-color: #eee;
+@mixin alert($backColor, $fontColor){
+    background-color: $backColor;
     padding: 20px;
     border-radius: 5px;
     max-width: 500px;
     width: 100%;
     margin: auto;
-}
-
-.my-alert {
-    @include alert;
+    text-align: center;
 
     p {
         margin-bottom: 0;
+        color: $fontColor;
     }
 }
+
+$yellow : #ffe591;
 
 .my-alert-red {
-    @extend .my-alert;
-    background-color: #ffe591;
-
-    p {
-        color: red;
-    }
+    @include alert($yellow, grey);
 }
+
+.my-alert-cart {
+    @include alert($yellow, grey);
+    max-width: none;
+}
+
+// .my-alert {
+//     @include alert;
+
+//     p {
+//         margin-bottom: 0;
+//     }
+// }
+
+// .my-alert-red {
+//     @extend .my-alert;
+//     background-color: #ffe591;
+
+//     p {
+//         color: red;
+//     }
+// }
 
 .tab-flex {
     display: flex;

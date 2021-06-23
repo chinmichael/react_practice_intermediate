@@ -1,10 +1,15 @@
-import React from 'react';
+
 import { Table, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
 function Cart(props) {
     return (
         <div>
+            {
+                props.state_alert === true
+                    ? <AlertModal store={props}></AlertModal>
+                    : null
+            }
             <Table responsive="lg">
                 <thead>
                     <tr>
@@ -18,14 +23,14 @@ function Cart(props) {
                     {
                         props.state.map((element, key) => {
                             return (
-                                <tr>
+                                <tr key={key}>
                                     <td>{element.id}</td>
                                     <td>{element.name}</td>
                                     <td>{element.quantity}</td>
                                     {/* <td><Button variant="warning" onClick={() => { props.dispatch({ type: 'quanIncrese', id: element.id }) }}>+</Button></td> */}
-                                    <td><Button variant="warning" onClick={() => { props.dispatch({ type: 'quanIncrese' }) }}>+</Button>
+                                    <td><Button variant="warning" onClick={() => { props.dispatch({ type: 'quanIncrese', payload: { id: element.id } }) }}>+</Button>
                                         &nbsp;
-                                        <Button variant="danger" onClick={() => { props.dispatch({ type: 'quanDecrese' }) }}>-</Button></td>
+                                        <Button variant="danger" onClick={() => { props.dispatch({ type: 'quanDecrese', payload: { id: element.id } }) }}>-</Button></td>
                                 </tr>
                             );
                         })
@@ -36,10 +41,19 @@ function Cart(props) {
     );
 }
 
+const AlertModal = (props) => {
+    return (
+        <div className="my-alert-cart">
+            <button className="close" onClick={() => { props.store.dispatch({ type: 'off' }) }}>X</button>
+            <p>지금 구매하면 신규할인 20%</p>
+        </div>
+    );
+}
+
 function store(state) {
     return {
-        state: state.reduer,
-        state_modal: state.modalReducer,
+        state: state.reducer,
+        state_alert: state.alertReducer,
     }
 }
 

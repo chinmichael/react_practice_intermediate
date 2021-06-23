@@ -2,7 +2,7 @@
 import './Detail.scss'; // css import는 그냥 이렇게 경로만
 
 import React, { useEffect, useState, useContext } from 'react';
-import { Container, Row, Col, Button, Nav } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import { useHistory, useParams } from 'react-router-dom';
 
 import styled from 'styled-components';
@@ -11,6 +11,8 @@ import styled from 'styled-components';
 import { stockContext } from './App.js';
 
 import { CSSTransition } from 'react-transition-group';
+
+import { connect } from 'react-redux';
 
 const TitleBox = styled.div`
     padding : 20px;
@@ -114,9 +116,16 @@ function Detail(props) { // props가 아니라 여기에 data.js를 import해도
                         // temp[index]--;
 
                         // props.stockChange(temp);
-                        let temp = [...stock.stock];
-                        temp[index]--;
-                        stock.stockChange(temp);
+                        if (stock.stock[index] > 0) {
+                            let temp = [...stock.stock];
+                            temp[index]--;
+                            stock.stockChange(temp);
+
+                            props.dispatch({ type: 'shipping', payload: { id: each_product.id, name: each_product.title, quantity: 1 } });
+
+                            history.push('/cart');
+
+                        }
                     }}>Shipping</Button> &nbsp;
 
                     <Button variant="warning" onClick={() => { history.goBack() }}>Go Back</Button>
@@ -205,5 +214,11 @@ const TabContents = (props) => {
     }
 }
 
-export default Detail;
+const store = (state) => {
+    return {
+        shipping: state.reducer,
+    }
+}
+
+export default connect(store)(Detail);
 

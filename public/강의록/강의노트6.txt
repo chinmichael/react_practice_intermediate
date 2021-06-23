@@ -190,7 +190,7 @@ Tip : 참고로 파라미터 안의 state=cart_store는 es6의 default parameter
 
 이후 reducer를 다음과 같이 수정해 데이터 수정이 가능하게 함
 
-function reducer(state=초기값, action) {
+function reducer(state=초기값, action) { // 두번째 파라미터가 dispatch의 데이터를 담고 있음 
     if(action.type === '수정방법') {
         updatedState = [...state];
         updatedState >> 수정 코드
@@ -228,3 +228,12 @@ function storeProps(state) {
 }
 
 이와 같이 뽑아서 저장해 사용한다.
+
+중요한 것은 그냥 한 컴포넌트 파일에서만 쓸 modal state 데이터 같은 경우는 Redux를 쓸 필요가 없고
+오히려 코드 효율성이 떨어진다. (그냥 useState가 낫다)
+Redux는 모든 state를 꼭 저장 관리하는 store가 아님
+
+마지막으로 dipatch로 데이터를 보내 수정하는 방법
+
+props.dispatch({type: , payload: }) << payload에 오브젝트로 넣어 보낸다(마찬가지로 action에서 꺼내 쓴다.)
+

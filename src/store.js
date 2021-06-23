@@ -1,26 +1,35 @@
 import { combineReducers, createStore } from 'redux';
 
 let cart_state = [
-    { id: 0, name: "niku", quantity: 2 },
-    { id: 1, name: "addidos", quantity: 4 },
-    { id: 2, name: "guma", quantity: 3 }
+    { id: 10, name: "niku", quantity: 2 },
+    { id: 11, name: "addidos", quantity: 4 },
+    { id: 12, name: "guma", quantity: 3 }
 ];
 
 function reducer(state = cart_state, action) {
 
-    if (action.type === 'quanIncrese') {
+    let updatedState = [...state];
+    let data = { ...action.payload };
 
-        let updatedState = [...state];
-        //let idx = updatedState.findIndex(x => { x.id == id });
+    if (action.type === 'shipping') {
+        let product = updatedState.find(e => e.id === data.id);
+        if (product == null) {
+            updatedState.push(data);
+        } else {
+            product.quantity++;
+        }
+        return updatedState;
 
-        updatedState[0].quantity++;
+    } else if (action.type === 'quanIncrese') {
+        updatedState.find(e => e.id === data.id).quantity++;
         return updatedState;
 
     } else if (action.type === 'quanDecrese') {
 
-        let updatedState = [...state];
-        if (updatedState[0].quantity > 0) {
-            updatedState[0].quantity--;
+        let product = updatedState.find(e => e.id === data.id);
+
+        if (product.quantity > 0) {
+            product.quantity--;
         }
         return updatedState;
 
@@ -29,9 +38,9 @@ function reducer(state = cart_state, action) {
     }
 }
 
-let modal_state = false;
+let alert_state = true; // 근데 한 컴포넌트 파일에서만 존재하는 데이터를 저장하는 용으로는 매우 안좋은 그냥 useState()를 쓰는게 낫다.
 
-function modalReducer(state = modal_state, action) {
+function alertReducer(state = alert_state, action) {
     let update = state;
 
     switch (action.type) {
@@ -46,7 +55,7 @@ function modalReducer(state = modal_state, action) {
     }
 }
 
-let store = createStore(combineReducers({ reducer, modalReducer }));
+let store = createStore(combineReducers({ reducer, alertReducer }));
 
 export default store;
 
