@@ -107,6 +107,32 @@ let stock = useContext(stockContext)을 한 뒤 stock.stock과 같이 뽑아서 
 (물론 광범위하게 여러 라우터를 감쌀 수도 있겠지만..)
 
 =================================================================================================================================================
+
+Vue에는 이제 Custom event를 통핸 emit을 좀더 자유롭게 하기 위해  mitt(emitter) 라이브러리를 사용한다.
+
+npm install mitt 
+
+main.js에서 
+import mitt from 'mitt';
+
+let emitter = mitt();
+let app = createApp(App);
+
+app.config.globalProperties.emitter = emitter; 로 세팅한다.
+config.globalProperties는 모든컴포넌트(글로벌)에서 적용되는 Object로 관리되는 변수 보관함으로 {emitter: emitter}로 이를 추가한것
+import axios from 'axios' createApp(App).config.globalProperties.axios = axios; 이런식으로 axios 등의 변수나 라이브러리도 추가하면 각 컴포넌트에서 일일히 import 하지 않아도 된다. (접근은 this.를 붙임)
+
+mitt 데이터 전송
+@click="send" 등의 이벤트 바인딩을 한 뒤
+methods:{send(){this.emitter.emit('이벤트명', 데이터)}}로 송신 (전역변수기에 this.을 붙인다)
+
+mitt 데이터 수신
+수신 컴포넌트에서 this.emitter.on('이벤트명', callback)으로 수신하며 보통 lifecycle hook 함수, mounted() 등을 이용해 처리한다.
+
+기존 $emit custom event과 유사하나 멀리 떨어진 컴포넌트의 다단 이동을 안해도 되므로 좀 더 편리함
+
+
+=================================================================================================================================================
 =================================================================================================================================================
 
 Redux 라이브러리 : 모든 컴포넌트에서 state를 공유할 수 있는 통합 관리 공간을 생성한다고 생각
@@ -237,3 +263,123 @@ Redux는 모든 state를 꼭 저장 관리하는 store가 아님
 
 props.dispatch({type: , payload: }) << payload에 오브젝트로 넣어 보낸다(마찬가지로 action에서 꺼내 쓴다.)
 
+
+==============================================================================================================================================
+
+Vuex : 모든 컴포넌트의 데이터 공유를 통한 상태관리 라이브러리 >> 대규모 사이트들에서 버그픽스에 유리하다
+
+Vue3 기준으로  (Vuex4 설치)
+npm install vuex@next
+
+src에 관리를 위한 store.js를 생성
+
+import { createStore } from 'vuex';
+
+const store = createStore({
+
+    state() {
+        return {
+
+        }
+    },
+
+})
+
+export default store;
+
+위의 store.js의 기본 설정이 끝났다면
+
+main.js에서
+import store from 'store경로';
+let app = createApp(App);
+app.use(store).mount(#app) 을 하여 루트 마운트 시 store를 이용하게 한다.
+
+
+이제 다시 store.js로 가서
+
+import { createStore } from 'vuex';
+
+import { post_ref } from './assets/post_ref';
+
+import axios from 'axios';
+
+const store = createStore({
+
+    state() { // vuex부터는 data가 아니라 state라 부르는게 나음
+        return {
+            name: 'Vuex 기본 연습',
+            age: 17,
+            post_inform: post_ref,
+            morePost: {},
+        }
+    },
+
+    mutations: {
+        changeAge(s, payload) { // 여기 파라미터는 무조건 위 state를 의미한다 (보통 state로 작명), payload 부분은 메시지로 받은 데이터
+            s.age += payload;
+        },
+        likeCheck(state, payload) {
+            if (state.post_inform[payload].liked) {
+                state.post_inform[payload].liked = false;
+                state.post_inform[payload].likes--;
+            } else {
+                state.post_inform[payload].liked = true;
+                state.post_inform[payload].likes++;
+            }
+        },
+        setMorePost(state, payload) {
+            state.morePost = payload;
+        },
+    },
+
+    actions: {
+        getData(context) { //context는 store라고 생각하면 됨
+            axios.get('https://codingapple1.github.io/vue/more0.json').then((a) => {
+                console.log(a.data);
+                context.commit('setMorePost', a.data);
+            })
+        }
+    },
+
+})
+
+export default store;
+
+
+store의 state를 가져와 쓰는 방법은
+React보다 매우 간단하게 main.js에서 다 세팅이 되었으므로
+
+template에서는 {{ $store.state.데이터변수}}로 끌어올 수 있고 함수에서는 this.$store.state.데이터변수 로 꺼내온다
+
+참고로 Reducer처럼 Vuex에서도 store의 state는 추적관리를 위해 store.js에서 일괄로 정의해놓고 사용해야 한다.
+여기서는 mutations:{} 각 함수명(state, payload) 로 정의해서 사용한다 state는 store의 state object, payload는 요청 파라미터로 보낸 data이다
+각 컴포넌트에서는 state 변경 요청을 $store.commit('함수명', data)로 처리해서 전송한다
+
+
+ajax요청의 경우 mutations에서 처리하지 않고 action에 넣어 처리한다 (비동기 처리들은 보통 action에 넣는다) 순차처리가 되지 않을 수 있기 때문이다
+
+각 컴포넌트에서 요청은 $store.dispatch('함수명')으로 하며
+
+함수명(context){} 으로 ajax 요청 등을 처리하고 또 여기서 발생한 state는 반드시 mutations에서 처리하게 context.commit('함수명'data)로 보낸다 (context는 store를 의미)
+
+
+추가적으로 mapState, mapMutations, mapActions를 각 컴포넌트에서 import해서 store의 state, 함수를 좀 더 편하게 호출도 가능하다
+
+import {mapState, mapMutations, mapActions} from 'vuex'를 한 뒤
+
+...mapState(['스테이트 변수','','']) ... mapMutations(['함수명','','']) ...mapActions(['함수명','',''])로 사용이 가능하다
+(mapState()의 경우 내부에 오브젝트로 넣을 수도 있다)
+(map으로 저장한 함수를 호출할 때는 commit('함수명',payload)가 아닌 함수명(payload))다
+
+참고로 ...mapMutations 등은 methods:{}에 넣는다치고
+...mapState는 computed:{}에 넣는 경우도 많다
+
+computed:{
+    함수명(){
+        return data;
+    },
+    ...mapState(['스테이트 변수','',''])
+}
+이렇게 보통 쓰는데 .vue파일이 처음 로드 되었을 때나 업데이트가 발생할 때만 실행되는 값을 저장하고 반환하는, 계속 찾을 필요가 없는 연산데이터 등을 저장할 때 쓴다. (함수명()이 아니라 함수명으로 찾아 쓴다)
+
+좀더 알기쉽게 이야기하면 methods는 함수 내부 코드가 호출마다 실행되는 한편 computed는 마운트나 업데이트 때만 실행되고 그 이후는 결과 데이터만 출력해준다
