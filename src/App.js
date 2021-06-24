@@ -3,12 +3,13 @@ import './App.css';
 import React from 'react';
 import { useState, useContext } from 'react';
 
-import { Link, Route, Switch } from 'react-router-dom'
+import { Link, Route, Switch, useHistory } from 'react-router-dom'
 
 import { Navbar, Nav, Jumbotron, Button, Container, Row, Col } from 'react-bootstrap'
 import { product } from './ref/data.js'
 import Detail from './Detail.js';
 import Cart from './Cart.js';
+import InputUseRef from './InputUseRef';
 
 import axios from 'axios';
 import { useEffect } from 'react';
@@ -68,6 +69,7 @@ function App() {
             <Nav.Link as={Link} to="/" className="router-link">Home</Nav.Link>
             <Nav.Link as={Link} to="/detail/1" className="router-link">Detail</Nav.Link>
             <Nav.Link as={Link} to="/cart" className="router-link">Cart</Nav.Link>
+            <Nav.Link as={Link} to="/test" className="router-link">test</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Navbar>
@@ -181,6 +183,10 @@ function App() {
           <Cart></Cart>
         </Route>
 
+        <Route path="/test">
+          <InputUseRef></InputUseRef>
+        </Route>
+
       </Switch>
 
     </div >
@@ -189,12 +195,15 @@ function App() {
 
 function ProductList(props) {
 
+  let history = useHistory();
+
   //let stock = useContext(stockContext);
 
   return (
-    <Col md={4}>
+    <Col md={4} onClick={() => { history.push(`/detail/${props.pro_list.id + 1}`) }} style={{ cursor: 'pointer' }}>
       <img src={`https://codingapple1.github.io/shop/shoes${props.cnt}.jpg`} width="100%"></img>
-      <Link to={`/detail/${props.pro_list.id + 1}`}><h4>{props.pro_list.title}</h4></Link>
+      {/* <Link to={`/detail/${props.pro_list.id + 1}`}><h4>{props.pro_list.title}</h4></Link> */}
+      <h4>{props.pro_list.title}</h4>
       <p>{props.pro_list.content} & {props.pro_list.price}</p>
       <Test index={props.cnt - 1}></Test>
     </Col>

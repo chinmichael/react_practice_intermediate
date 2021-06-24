@@ -13,6 +13,7 @@ function reducer(state = cart_state, action) {
 
     if (action.type === 'shipping') {
         let product = updatedState.find(e => e.id === data.id);
+        // let idx = updateState.findIndex(e => { return e.id === data.id})
         if (product == null) {
             updatedState.push(data);
         } else {

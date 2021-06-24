@@ -1,0 +1,120 @@
+여러가지 Tip
+
+1. Array.find()에서 Arrow Function 주의
+
+Expected an assignment or function call and instead saw an expression  no-unused-expressions
+
+계속 이게 터져서 먼가 했더니
+Arrow function에서 () => {} 와 () => ()를 구분해야 한다.
+() => {}의 경우 반환값 처리를 하려면 반드시 return 문을 써야 하며
+() => ()의 경우 자동적으로 return 처리가 된다.
+
+
+2. React 조건문 작성 패턴
+
+2-1. JSX 외부 (랜더링되는 컴포넌트 return() 밖에서)
+
+>> if-else문이나 switch-case 문을 사용해서 각 조건에 대해 마지막으로 return()한 JSX나 JSX에 바인딩 될 변수를 세팅하면 된다.
+
+2-2. JSX 내부
+
+1) 대표 삼항연산자(ternary operator) 사용 { 조건문 ? 참에 보여줄 JSX : 거짓에 보여줄 JSX (혹은 null)}
+   >> 참고로 조건문 중첩도 당근 된다 >> 각 참 or 거짓 영역에 괄호을 통해 또 삼항연산자 추가 >> 근데 복잡해지므로 외부 if문으로 변수를 데이터바인딩하는게 낫다
+
+2) && 이용  : 본래 &&연산자는 양 조건이 true일떄만 true 나머지는 false를 반환하지만
+              >> JS의 경우 특이하게 bool조건과 그밖에 자료형이 들어가면 true && 자료형 일때는 자료형이 false && 자료형이면 false가 남는다
+              >> false는 HTML로 랜더링 하지 않으므로
+              
+              >> false조건에서 null로 반환하는 간단한 JSX조건문에서는 { 조건문 && JSX }로 만들 수 있다.
+
+3) Object enum 이용
+JS는 오브젝트 {}에 []을 붙여 {}[]을 이용하면 각 key에 해당하는 value를 출력시키게 할 수 있다
+let [currentKey, setKey] = useState('KEY1'); // 문자열임
+
+return (
+<div>
+{
+    {   KEY1 : <div></div>,
+        KEY2 : <div></div>,
+        KEY3 : <div></div>
+    }[currentKey]
+}
+</div>
+)
+이런식으로 변수 currentKey에 저장된 키에 따라 조거문처럼 Object의 value를 뽑아 쓸 수 있음
+참고로 해당 Object를 당연히 상수로 저장하고 써도 된다.
+
+const tab = {
+    KEY1 : <div></div>,
+    KEY2 : <div></div>,
+    KEY3 : <div></div>
+}
+
+let [currentKey, setKey] = useState('KEY1');
+return (
+    <div>
+        {
+            tab[currentKey]
+        }
+    </div>
+)
+
+참고로 열거형(enum, enumerated type)은 서로 연관된 상수의 집합이라고 할 수 있다.
+명명된 상수 역할의 식별자 그룹
+
+예를 들어 자바에서는
+enum Browser {
+    CHROME, FIREFOX;
+}
+
+public class ~ {
+    public void ~ {
+        Browser type = Browser.CHROME;
+        if(type == FIREFOX) {
+
+        }
+    }
+}
+
+이런식으로 사용 가능하다. JAVA에서 Enum은 특유의 문법을 가진 class라고 생각하면 된다.
+
+참고로 JAVA의 각 enum간에는 서로 비교가 불가능하게 컴파일시점에서 차단되며
+위 enum은
+class Browser {
+    public static final Browser CHROME = new Browser();
+    public static final Browser FIREFOX = new Browser();
+
+    private Browser(){};
+}
+이기 떄문에 enum은 인스턴스를 따로 만들 수 없다. >> 용도를 제한하기 위해서임
+
+물론 private 생성자란 조건하에 (public으로 생성자는 불가)
+enum Browser {
+    CHROME, FIREFOX;
+    Browser(){
+        System.out.println("call " + this);
+    }
+}
+로
+Browser.CHROME; 호출 시 콘솔에 call CHROME이 찍히는 등의 설정을 할 수 있다.
+
+물론 메서드도 가질 수 있음
+enum Browser {
+    CHROME("google"), FIREFOX("mozilla");
+    private String company;
+    Browser(String company){
+        this.company = company;
+        System.out.println("call " + this);
+    }
+    public String getCompany() {
+        return this.company;
+    }
+}
+
+이후 Browser.CHROME.getCompany(); 이런식으로 사용가능
+
+>> 단순 상수가 아닌 여러 역할을 시킬때 JAVA Enum을 사용함
+
+JAVA의 Enum이 좀 강력크한거지 보통 JS의 Enum처럼 상수집합에서 제한된 범주영역의 무언가를 꺼낼때 사용 (근데 JS도 Object로 되어있어서 효율성은 ㄱㅊ은듯)
+
+어떻게보면 Boolean의 ture false도 일종의 열거형일 수 있따.
