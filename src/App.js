@@ -1,7 +1,7 @@
 /* eslint-disable */
 import './App.css';
 import React from 'react';
-import { useState, useContext } from 'react';
+import { useState, useContext, lazy, Suspense } from 'react';
 
 import { Link, Route, Switch, useHistory } from 'react-router-dom'
 
@@ -9,7 +9,8 @@ import { Navbar, Nav, Jumbotron, Button, Container, Row, Col } from 'react-boots
 import { product } from './ref/data.js'
 import Detail from './Detail.js';
 import Cart from './Cart.js';
-import InputUseRef from './InputUseRef';
+//import InputUseRef from './InputUseRef';
+const InputUseRef = lazy(() => { return import('./InputUseRef.js') });
 
 import axios from 'axios';
 import { useEffect } from 'react';
@@ -184,7 +185,9 @@ function App() {
         </Route>
 
         <Route path="/test">
-          <InputUseRef></InputUseRef>
+          <Suspense fallback={<div><p>Now Loading....</p></div>}>
+            <InputUseRef></InputUseRef>
+          </Suspense>
         </Route>
 
       </Switch>
